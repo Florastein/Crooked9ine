@@ -4,10 +4,16 @@ import { TaskColumn } from './components/dashboard/TaskColumn';
 import { UpcomingDeadlines } from './components/dashboard/UpcomingDeadlines';
 import { tasks as initialTasks, Task } from './data/mockData';
 import { CreateTaskModal } from './components/modals/CreateTaskModal';
+import LoginPage from './components/login';
 
 const App: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
 
   const todoTasks = tasks.filter(task => task.status === 'todo');
   const inProgressTasks = tasks.filter(task => task.status === 'in-progress');
@@ -28,6 +34,10 @@ const App: React.FC = () => {
     setTasks(prevTasks => [newTask, ...prevTasks]);
     setIsModalOpen(false);
   };
+
+  if (!isLoggedIn) {
+    return <LoginPage onLogin={handleLogin} />;
+  }
 
   return (
     <div className="min-h-screen bg-background dark:bg-background-dark">
