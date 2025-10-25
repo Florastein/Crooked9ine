@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Crooked9ine - Task Management</title>
+    <title>Crooked9ine - Dashboard</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
@@ -13,30 +13,45 @@
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#003366",
-                        "primary-light": "#6699CC",
-                        "background-light": "#F5F5F5",
-                        "background-dark": "#101922",
-                        "text-light": "#333333",
-                        "text-dark": "#E0E0E0",
+                        "primary": "#2563EB",
+                        "accent": "#F97316",
+                        "background": "#F4F7FE",
+                        "background-dark": "#111827",
+                        "card": "#FFFFFF",
+                        "card-dark": "#1F2937",
+                        "text-main": "#111827",
+                        "text-main-dark": "#F9FAFB",
+                        "text-secondary": "#6B7280",
+                        "text-secondary-dark": "#9CA3AF",
+                        "border-light": "#E5E7EB",
+                        "border-dark": "#374151",
+                        "deadline-red": "#FECACA",
+                        "deadline-orange": "#FED7AA",
+                        "deadline-yellow": "#FEF08A",
+                        "task-red": "#EF4444",
+                        "task-yellow": "#F59E0B",
+                        "task-green": "#10B981",
+                        "task-blue": "#3B82F6",
+                        "modal-overlay": "rgba(0, 0, 0, 0.4)",
+                        "modal-bg": "#F8FBFB",
+                        "modal-border": "#E8EDED",
+                        "button-save": "#2E5D59",
+                        "button-save-hover": "#254a47",
+                        "button-cancel": "#E8EDED",
+                        "button-cancel-hover": "#dbe0e0",
+                        "button-cancel-text": "#546E6C",
                     },
                     fontFamily: {
                         "display": ["Inter", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
                     },
                 },
             },
         }
     </script>
     <style>
-        .form-input:focus {
-            outline: none;
-            box-shadow: none;
+       body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
     </style>
   <script type="importmap">
@@ -49,7 +64,7 @@
 }
 </script>
 </head>
-  <body class="bg-background-light dark:bg-background-dark font-display">
+  <body class="bg-background dark:bg-background-dark font-display text-text-main dark:text-text-main-dark">
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
