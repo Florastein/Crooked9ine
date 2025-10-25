@@ -9,17 +9,20 @@ const trafficSources = [
 
 export const TrafficSource: React.FC = () => {
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md">
-      <h3 className="font-bold text-lg mb-4">Traffic Source</h3>
-      <div className="space-y-4">
+    <div className="bg-white p-3 sm:p-4 rounded-lg shadow-md">
+      <h3 className="font-bold text-base sm:text-lg mb-3 sm:mb-4">Traffic Source</h3>
+      <div className="space-y-3 sm:space-y-4">
         {trafficSources.map((source, index) => (
           <div key={index}>
-            <div className="flex justify-between text-sm mb-1">
+            <div className="flex justify-between text-xs sm:text-sm mb-1">
               <span>{source.source}</span>
               <span>{source.percentage}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
-              <div className="bg-gray-800 h-2.5 rounded-full" style={{ width: `${source.percentage}%` }}></div>
+            <div className="w-full bg-gray-200 rounded-full h-1.5 sm:h-2.5">
+              <div 
+                className="bg-gray-800 h-1.5 sm:h-2.5 rounded-full" 
+                style={{ width: `${source.percentage}%` }}
+              ></div>
             </div>
           </div>
         ))}
