@@ -5,6 +5,8 @@ import { DashboardPage } from './pages/DashboardPage';
 import { TaskDetailsPage } from './pages/TaskDetailsPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { useAuth } from './hooks/useAuth';
+import { UserTeamManagementPage } from './pages/UserTeamManagementPage';
+
 
 function App() {
   const { user, loading } = useAuth();
@@ -28,6 +30,10 @@ function App() {
         path="/admin" 
         element={user ? <AdminDashboardPage /> : <Navigate to="/login" />} 
       />
+
+// Add these routes
+<Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+<Route path="/admin/users" element={<UserTeamManagementPage />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );

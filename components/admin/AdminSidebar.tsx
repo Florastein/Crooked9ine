@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface AdminSidebarProps {
   onClose?: () => void;
@@ -7,13 +8,41 @@ interface AdminSidebarProps {
 
 export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onClose }) => {
   const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const handleLinkClick = () => {
+  const handleLinkClick = (path: string) => {
+    navigate(path);
     // Close sidebar on mobile when a link is clicked
     if (window.innerWidth < 1024 && onClose) {
       onClose();
     }
   };
+
+  const isActivePath = (path: string) => {
+    return location.pathname === path;
+  };
+
+  const navItems = [
+    {
+      path: '/admin/dashboard',
+      icon: 'dashboard',
+      label: 'Dashboard',
+      active: isActivePath('/admin/dashboard')
+    },
+    {
+      path: '/admin/users',
+      icon: 'group',
+      label: 'User Management',
+      active: isActivePath('/admin/users') || location.pathname.startsWith('/admin/users')
+    },
+    {
+      path: '/admin/teams',
+      icon: 'workspaces',
+      label: 'Team Progress',
+      active: isActivePath('/admin/teams')
+    },
+  ];
 
   return (
     <div className="w-64 h-full bg-white shadow-md p-4 flex flex-col overflow-y-auto">
@@ -41,29 +70,39 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onClose }) => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-col gap-3 sm:gap-4 flex-1">
-        <a 
-          href="#" 
-          className="flex items-center gap-2 text-gray-600 hover:text-black p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          onClick={handleLinkClick}
-        >
-          <span className="material-symbols-outlined text-lg">dashboard</span>
-          <span className="text-sm sm:text-base">Dashboard</span>
-        </a>
-        <a 
-          href="#" 
-          className="flex items-center gap-2 text-gray-600 hover:text-black p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          onClick={handleLinkClick}
-        >
-          <span className="material-symbols-outlined text-lg">group</span>
-          <span className="text-sm sm:text-base">Team Progress</span>
-        </a>
+      <nav className="flex flex-col gap-1 sm:gap-2 flex-1">
+        {navItems.map((item) => (
+          <button
+            key={item.path}
+            onClick={() => handleLinkClick(item.path)}
+            className={`flex items-center gap-2 p-3 rounded-lg transition-colors text-left ${
+              item.active
+                ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                : 'text-gray-600 hover:text-black hover:bg-gray-100'
+            }`}
+          >
+            <span 
+              className={`material-symbols-outlined text-lg ${
+                item.active ? 'text-blue-600' : ''
+              }`}
+            >
+              {item.icon}
+            </span>
+            <span className="text-sm sm:text-base font-medium">{item.label}</span>
+            {item.active && (
+              <div className="ml-auto w-2 h-2 bg-blue-600 rounded-full"></div>
+            )}
+          </button>
+        ))}
       </nav>
 
       {/* Bottom section */}
       <div className="mt-auto space-y-3 sm:space-y-4">
         {/* Create New Task Button - Full width in sidebar */}
-        <button className="w-full flex items-center justify-center gap-2 bg-gray-800 text-white font-semibold py-2 px-3 rounded-lg text-xs sm:text-sm hover:bg-gray-700 transition-colors">
+        <button 
+          onClick={() => handleLinkClick('/admin/tasks/create')}
+          className="w-full flex items-center justify-center gap-2 bg-gray-800 text-white font-semibold py-2 px-3 rounded-lg text-xs sm:text-sm hover:bg-gray-700 transition-colors"
+        >
           <span className="material-symbols-outlined text-sm">add</span>
           <span>Create New Task</span>
         </button>
@@ -83,6 +122,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onClose }) => {
               {user?.email || 'user@example.com'}
             </span>
           </div>
+          {/* Settings button */}
+          <button 
+            onClick={() => handleLinkClick('/admin/profile')}
+            className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <span className="material-symbols-outlined text-sm">settings</span>
+          </button>
         </div>
       </div>
     </div>
