@@ -5,7 +5,17 @@ interface CalendarProps {
 }
 
 export const Calendar: React.FC<CalendarProps> = ({ deadlines }) => {
-  const [currentDate, setCurrentDate] = useState(new Date(2023, 9, 26)); // Set to October 2023
+  const getInitialDate = () => {
+    if (deadlines && deadlines.length > 0) {
+      // Sort to find the earliest deadline
+      const sortedDeadlines = [...deadlines].sort();
+      const [year, month, day] = sortedDeadlines[0].split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
+    return new Date();
+  };
+  
+  const [currentDate, setCurrentDate] = useState(getInitialDate);
 
   const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
   const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
@@ -21,7 +31,13 @@ export const Calendar: React.FC<CalendarProps> = ({ deadlines }) => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
   };
   
-  const deadlineDates = useMemo(() => new Set(deadlines), [deadlines]);
+  const deadlineSet = useMemo(() => new Set(deadlines), [deadlines]);
+  
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
 
   const days = [];
   for (let i = 0; i < startingDay; i++) {
@@ -30,20 +46,37 @@ export const Calendar: React.FC<CalendarProps> = ({ deadlines }) => {
 
   for (let i = 1; i <= daysInMonth; i++) {
     const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), i);
+    dayDate.setHours(0,0,0,0);
     const dateString = dayDate.toISOString().split('T')[0];
+    const isToday = dayDate.getTime() === today.getTime();
     
-    let deadlineClass = '';
-    // Hardcoding deadline colors as per the design for specific dates in Oct 2023
-    if (currentDate.getFullYear() === 2023 && currentDate.getMonth() === 9) {
-        if (i === 25) deadlineClass = 'bg-red-500 text-white';
-        else if (i === 26) deadlineClass = 'bg-red-500 text-white';
-        else if (i === 28) deadlineClass = 'bg-deadline-orange ring-2 ring-orange-400';
-        else if (i === 30) deadlineClass = 'bg-deadline-yellow ring-2 ring-yellow-400';
+    let baseClass = '';
+    let ringClass = '';
+
+    if (deadlineSet.has(dateString)) {
+        const timeDiff = dayDate.getTime() - today.getTime();
+        const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        
+        if (dayDiff < 0) {
+            baseClass = 'bg-gray-400 dark:bg-gray-600 text-white opacity-60'; // Past due
+        } else if (dayDiff <= 2) {
+            baseClass = 'bg-red-500 text-white'; // Due in 0-2 days
+        } else if (dayDiff <= 7) {
+            baseClass = 'bg-orange-500 text-white'; // Due in 3-7 days
+        } else {
+            baseClass = 'bg-yellow-400 text-black'; // Due later
+        }
+    }
+    
+    if (isToday) {
+        ringClass = 'ring-2 ring-primary dark:ring-blue-400 ring-offset-2 dark:ring-offset-card-dark';
+        if (!baseClass) {
+            baseClass = 'text-primary dark:text-blue-400 font-bold';
+        }
     }
 
-
     days.push(
-      <div key={i} className={`flex items-center justify-center h-8 w-8 text-sm rounded-full ${deadlineClass}`}>
+      <div key={i} className={`flex items-center justify-center h-8 w-8 text-sm rounded-full transition-colors ${baseClass} ${ringClass}`}>
         {i}
       </div>
     );

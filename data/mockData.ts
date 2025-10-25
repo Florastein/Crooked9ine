@@ -1,124 +1,99 @@
-export interface User {
-  id: string;
-  name: string;
-  avatarUrl: string;
-}
+import { Task, User, Comment } from '../types';
 
-export interface Task {
-  id: string;
-  title: string;
-  // FIX: Added optional description property to the Task interface.
-  description?: string;
-  status: 'todo' | 'in-progress' | 'completed';
-  dueDate?: string;
-  assignees: User[];
-  completedDate?: string;
-  categoryColor: 'red' | 'yellow' | 'green' | 'blue';
-}
+export const mockUsers: User[] = [
+  { id: 'user-1', name: 'Alex Johnson', avatar: 'https://i.pravatar.cc/150?u=user-1' },
+  { id: 'user-2', name: 'Samantha Carter', avatar: 'https://i.pravatar.cc/150?u=user-2' },
+  { id: 'user-3', name: 'Daniel Jackson', avatar: 'https://i.pravatar.cc/150?u=user-3' },
+  { id: 'user-4', name: 'Teal\'c', avatar: 'https://i.pravatar.cc/150?u=user-4' },
+];
 
-export const users: { [key: string]: User } = {
-  user1: { id: 'user1', name: 'Alex Johnson', avatarUrl: 'https://i.pravatar.cc/32?u=user1' },
-  user2: { id: 'user2', name: 'Maria Garcia', avatarUrl: 'https://i.pravatar.cc/32?u=user2' },
-  user3: { id: 'user3', name: 'James Smith', avatarUrl: 'https://i.pravatar.cc/32?u=user3' },
-  user4: { id: 'user4', name: 'Li Wei', avatarUrl: 'https://i.pravatar.cc/32?u=user4' },
-};
-
-export const priorities = [
-    { id: 'p1', name: 'High', color: 'red' },
-    { id: 'p2', name: 'Medium', color: 'yellow' },
-    { id: 'p3', name: 'Low', color: 'green' },
+const mockComments: Comment[] = [
+    {
+        id: 'comment-1',
+        user: mockUsers[2],
+        text: 'I\'ve started working on the authentication logic. Should have a PR ready by EOD.',
+        timestamp: '2023-10-25T10:00:00Z',
+    },
+    {
+        id: 'comment-2',
+        user: mockUsers[0],
+        text: 'Great, let me know if you need any help with the UI components for it.',
+        timestamp: '2023-10-25T11:30:00Z',
+    }
 ]
 
-export const tasks: Task[] = [
-  // To Do
+export const mockTasks: Task[] = [
   {
-    id: 'task1',
-    title: 'Finalize Q3 budget report',
-    status: 'todo',
-    dueDate: '2023-10-26',
-    assignees: [users.user1],
-    categoryColor: 'red',
-  },
-  {
-    id: 'task2',
-    title: 'Develop new landing page',
-    status: 'todo',
+    id: 'task-1',
+    title: 'Design the new dashboard layout',
+    description: 'Create a modern and intuitive dashboard design using Figma. Focus on user experience and clarity of information. The design should be responsive and work on both desktop and mobile devices. Please include dark mode variants.',
+    status: 'In Progress',
+    priority: 'High',
     dueDate: '2023-10-28',
-    assignees: [users.user2, users.user3],
-    categoryColor: 'yellow',
+    assignees: [mockUsers[0], mockUsers[1]],
+    project: 'Project Phoenix',
+    sprint: 'Sprint 1',
+    tags: ['UI', 'Design'],
   },
   {
-    id: 'task3',
-    title: 'User authentication flow',
-    status: 'todo',
-    dueDate: '2023-11-02',
-    assignees: [users.user1],
-    categoryColor: 'yellow',
+    id: 'task-2',
+    title: 'Develop the authentication flow',
+    description: 'Implement user login and registration using Firebase Authentication. Support for Google and email/password sign-in.',
+    status: 'In Progress',
+    priority: 'High',
+    dueDate: '2023-10-26',
+    assignees: [mockUsers[2]],
+    project: 'Project Phoenix',
+    sprint: 'Sprint 1',
+    tags: ['Frontend', 'Auth'],
+    comments: mockComments,
   },
   {
-    id: 'task4',
-    title: 'Draft marketing copy',
-    status: 'todo',
-    dueDate: '2023-11-05',
-    assignees: [users.user4],
-    categoryColor: 'green',
-  },
-  // In Progress
-  {
-    id: 'task5',
-    title: 'API Integration for payments',
-    status: 'in-progress',
-    dueDate: '2023-10-25',
-    assignees: [users.user2],
-    categoryColor: 'red',
-  },
-  {
-    id: 'task6',
-    title: 'QA Testing for mobile app',
-    status: 'in-progress',
+    id: 'task-3',
+    title: 'Set up the database schema',
+    description: 'Define and implement the Firestore database schema for tasks, users, and projects.',
+    status: 'To Do',
+    priority: 'Medium',
     dueDate: '2023-10-30',
-    assignees: [users.user3, users.user4],
-    categoryColor: 'yellow',
-  },
-  // Completed
-  {
-    id: 'task7',
-    title: 'Onboarding flow design',
-    status: 'completed',
-    completedDate: '2023-10-15',
-    assignees: [],
-    categoryColor: 'blue',
+    assignees: [mockUsers[3]],
+    project: 'Project Phoenix',
+    sprint: 'Sprint 1',
+    tags: ['Backend', 'Database'],
   },
   {
-    id: 'task8',
-    title: 'Setup database schema',
-    status: 'completed',
-    completedDate: '2023-10-12',
-    assignees: [],
-    categoryColor: 'blue',
+    id: 'task-4',
+    title: 'Create the task card component',
+    description: 'Build a reusable React component for displaying task information in the columns.',
+    status: 'Done',
+    priority: 'Medium',
+    dueDate: '2023-10-25',
+    assignees: [mockUsers[1]],
+    project: 'Project Phoenix',
+    sprint: 'Sprint 1',
+    tags: ['Frontend', 'Component'],
   },
-    {
-    id: 'task9',
-    title: 'Initial project setup',
-    status: 'completed',
-    completedDate: '2023-10-10',
-    assignees: [],
-    categoryColor: 'blue',
+  {
+    id: 'task-5',
+    title: 'API integration for tasks',
+    description: 'Connect the frontend to the backend API to fetch and update tasks.',
+    status: 'In Review',
+    priority: 'High',
+    dueDate: '2023-10-26',
+    assignees: [mockUsers[0], mockUsers[2]],
+    project: 'Project Phoenix',
+    sprint: 'Sprint 1',
+    tags: ['Frontend', 'API'],
   },
-    {
-    id: 'task10',
-    title: 'Review wireframes',
-    status: 'completed',
-    completedDate: '2023-10-09',
-    assignees: [],
-    categoryColor: 'blue',
-  },
-    {
-    id: 'task11',
-    title: 'Kick-off meeting notes',
-    status: 'completed',
-    completedDate: '2023-10-05',
-    assignees: [],
-    categoryColor: 'blue',
-  },
+  {
+    id: 'task-6',
+    title: 'Fix login button styling on mobile',
+    description: 'The login button is not rendering correctly on small screen sizes. Needs CSS adjustments.',
+    status: 'To Do',
+    priority: 'Low',
+    dueDate: '2023-11-02',
+    assignees: [mockUsers[1]],
+    project: 'Project Phoenix',
+    sprint: 'Sprint 2',
+    tags: ['Bug', 'CSS'],
+  }
 ];
