@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { TaskDetailsPage } from './pages/TaskDetailsPage';
+import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { useAuth } from './hooks/useAuth';
 
 function App() {
@@ -22,6 +23,10 @@ function App() {
        <Route 
         path="/task/:taskId" 
         element={user ? <TaskDetailsPage /> : <Navigate to="/login" />} 
+      />
+      <Route 
+        path="/admin" 
+        element={user ? <AdminDashboardPage /> : <Navigate to="/login" />} 
       />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>

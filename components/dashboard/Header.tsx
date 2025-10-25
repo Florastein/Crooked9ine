@@ -1,4 +1,7 @@
 import React from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import { auth } from '../../firebase';
+
 
 const Logo = () => (
     <div className="flex items-center gap-2">
@@ -16,11 +19,17 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onNewTaskClick }) => {
+  const { user } = useAuth();
+
+  const handleLogout = async () => {
+    await auth.signOut();
+  };
+
   return (
     <header className="bg-card dark:bg-card-dark shadow-sm p-4 border-b border-border-light dark:border-border-dark">
       <div className="flex items-center justify-between mx-auto">
         <div className="flex items-center gap-8">
-          <img src="../../llogo.png" alt="crooked9ine logo" className="h-10 w-10 rounded" />
+          <img src="https://wzwyluzlsimmdohmwvvs.supabase.co/storage/v1/object/public/sector/wine.png" alt="crooked9ine logo" className="h-14 w-14 rounded" />
           <nav className="hidden md:flex items-center gap-6">
             <a href="#" className="text-sm font-semibold text-primary border-b-2 border-primary pb-1">Dashboard</a>
             <a href="#" className="text-sm font-semibold text-text-secondary dark:text-text-secondary-dark hover:text-primary">Team Progress</a>
@@ -42,9 +51,10 @@ export const Header: React.FC<HeaderProps> = ({ onNewTaskClick }) => {
             <span className="material-symbols-outlined text-base">add</span>
             Create New Task
           </button>
-           <div className="w-9 h-9 rounded-full overflow-hidden">
-             <img src="https://i.pravatar.cc/48?u=user-avatar" alt="User avatar" className="w-full h-full object-cover" />
-           </div>
+          <div className="w-9 h-9 rounded-full overflow-hidden">
+            <img src={user?.photoURL || "https://i.pravatar.cc/48?u=user-avatar"} alt="User avatar" className="w-full h-full object-cover" />
+          </div>
+          <button onClick={handleLogout} className="text-sm font-semibold text-text-secondary dark:text-text-secondary-dark hover:text-primary">Sign Out</button>
         </div>
       </div>
     </header>

@@ -54,7 +54,7 @@ export const LoginPage: React.FC = () => {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="flex w-full max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden my-4">
         {/* Image Section */}
-        <div
+        <div 
           className="hidden md:block w-1/2 bg-cover bg-center"
           style={{
             backgroundImage:
@@ -66,10 +66,13 @@ export const LoginPage: React.FC = () => {
         {/* Form Section */}
         <div className="w-full md:w-1/2 p-8 md:p-12">
           <div className="text-left">
-            <p className="font-bold text-lg text-gray-900">crooked9ine</p>
-            <h1 className="text-4xl font-bold mt-4 text-gray-900">Welcome Back</h1>
+            <div className="flex items-center mb-4">
+              <img src="https://wzwyluzlsimmdohmwvvs.supabase.co/storage/v1/object/public/sector/wine.png" alt="Crooked9ine Logo" className="h-12 w-auto" />
+              <span className="text-2xl font-bold text-gray-800 ml-3">Crooked9ine</span>
+            </div>
+            <h1 className="text-3xl font-bold mt-4 text-gray-900">Welcome Back</h1>
           </div>
-
+          
           {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
 
           <form className="mt-8 space-y-5" noValidate onSubmit={handleLogin}>
@@ -110,7 +113,7 @@ export const LoginPage: React.FC = () => {
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOffIcon className="h-6 w-6 text-gray-500" /> : <EyeIcon className="h-6 w-6 text-gray-500" />}
                 </button>
@@ -157,7 +160,7 @@ export const LoginPage: React.FC = () => {
               </span>
             </div>
           </div>
-
+          
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <AuthProviderButton provider="Google" icon={<GoogleIcon />} onClick={handleGoogleLogin} />
             <AuthProviderButton provider="Microsoft" icon={<MicrosoftIcon />} onClick={handleMicrosoftLogin} />
@@ -172,6 +175,9 @@ export const LoginPage: React.FC = () => {
               </a>
             </p>
           </div>
+          <p className="text-xs text-center text-gray-400 mt-6">
+            Powered by NetHub Dukel
+          </p>
         </div>
       </div>
     </div>
