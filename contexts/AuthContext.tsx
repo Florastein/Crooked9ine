@@ -1,34 +1,25 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
-// Mock user type. In a real app, this might come from firebase/auth.
-type AuthUser = {
-  uid: string;
-  email: string | null;
-  displayName: string | null;
-};
+import { User } from 'firebase/auth';
+import { auth } from '../firebase';
 
 interface AuthContextType {
-  user: AuthUser | null;
+  user: User | null;
   loading: boolean;
-  // login, logout functions would be here
 }
 
 export const AuthContext = createContext<AuthContextType>({ user: null, loading: true });
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mocking auth state check
-    const timeout = setTimeout(() => {
-      // To test the app with auth, change this to a mock user object
-      // e.g., setUser({ uid: '123', email: 'test@test.com', displayName: 'Test User' });
-      // To test the login page, leave it as null
-       setUser(null); // Mock as logged out
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      setUser(user);
       setLoading(false);
-    }, 1000);
+    });
 
-    return () => clearTimeout(timeout);
+    return unsubscribe;
   }, []);
 
   const value = {

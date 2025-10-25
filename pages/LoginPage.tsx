@@ -5,21 +5,61 @@ import { MicrosoftIcon } from '../components/icons/MicrosoftIcon';
 import { AppleIcon } from '../components/icons/AppleIcon';
 import { EyeIcon } from '../components/icons/EyeIcon';
 import { EyeOffIcon } from '../components/icons/EyeOffIcon';
-
+import { auth } from '../firebase';
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, OAuthProvider } from 'firebase/auth';
 
 export const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
-  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error: any) {
+      setError(error.message);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error: any) {
+      setError(error.message);
+    }
+  };
+
+  const handleMicrosoftLogin = async () => {
+    const provider = new OAuthProvider('microsoft.com');
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error: any) {
+      setError(error.message);
+    }
+  };
+
+  const handleAppleLogin = async () => {
+    const provider = new OAuthProvider('apple.com');
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error: any) {
+      setError(error.message);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="flex w-full max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden my-4">
         {/* Image Section */}
-        <div 
+        <div
           className="hidden md:block w-1/2 bg-cover bg-center"
           style={{
-              backgroundImage:
-                'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAa7pjnjytnfyrvdE6Vr0AZefQCs2h1142Shr_RX-FqXvhWcM33vfUBgiiKrITbejgU6U8sqsByurdx6599cLu5-qW8NWKUI9IxAEIGjy1hfGZfiiDyrRl3HLcpYtippLOBdft_dXHOtE_H_VpIrOrVvES8cYcnvbAoe9alvv4aLMjDWO2nSUF727EMAPrnScRjcusl1OZfnElHwwxFlvn-ZvqeJSOzrIu8RFrdVFMaB3j451PvfIM93qFn2gBgF7cahXGIqKtdIYdr")',
-            }}
+            backgroundImage:
+              'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAa7pjnjytnfyrvdE6Vr0AZefQCs2h1142Shr_RX-FqXvhWcM33vfUBgiiKrITbejgU6U8sqsByurdx6599cLu5-qW8NWKUI9IxAEIGjy1hfGZfiiDyrRl3HLcpYtippLOBdft_dXHOtE_H_VpIrOrVvES8cYcnvbAoe9alvv4aLMjDWO2nSUF727EMAPrnScRjcusl1OZfnElHwwxFlvn-ZvqeJSOzrIu8RFrdVFMaB3j451PvfIM93qFn2gBgF7cahXGIqKtdIYdr")',
+          }}
           aria-hidden="true"
         ></div>
 
@@ -29,8 +69,10 @@ export const LoginPage: React.FC = () => {
             <p className="font-bold text-lg text-gray-900">crooked9ine</p>
             <h1 className="text-4xl font-bold mt-4 text-gray-900">Welcome Back</h1>
           </div>
-          
-          <form className="mt-8 space-y-5" noValidate>
+
+          {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
+
+          <form className="mt-8 space-y-5" noValidate onSubmit={handleLogin}>
             <div>
               <label htmlFor="email-address" className="text-sm font-medium text-gray-700">
                 Email Address
@@ -41,6 +83,8 @@ export const LoginPage: React.FC = () => {
                 type="email"
                 autoComplete="email"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 appearance-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-gray-800 focus:border-gray-800 sm:text-sm"
                 placeholder="Enter your email"
               />
@@ -57,6 +101,8 @@ export const LoginPage: React.FC = () => {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="appearance-none block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-gray-800 focus:border-gray-800 sm:text-sm"
                   placeholder="Enter your password"
                 />
@@ -64,7 +110,7 @@ export const LoginPage: React.FC = () => {
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOffIcon className="h-6 w-6 text-gray-500" /> : <EyeIcon className="h-6 w-6 text-gray-500" />}
                 </button>
@@ -111,11 +157,11 @@ export const LoginPage: React.FC = () => {
               </span>
             </div>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <AuthProviderButton provider="Google" icon={<GoogleIcon />} />
-            <AuthProviderButton provider="Microsoft" icon={<MicrosoftIcon />} />
-            <AuthProviderButton provider="Apple" icon={<AppleIcon />} />
+            <AuthProviderButton provider="Google" icon={<GoogleIcon />} onClick={handleGoogleLogin} />
+            <AuthProviderButton provider="Microsoft" icon={<MicrosoftIcon />} onClick={handleMicrosoftLogin} />
+            <AuthProviderButton provider="Apple" icon={<AppleIcon />} onClick={handleAppleLogin} />
           </div>
 
           <div className="text-sm text-center mt-8">

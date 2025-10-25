@@ -69,6 +69,7 @@ export const DashboardPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+              {/* FIX: onDeleteRequest prop was causing an error and is now handled in TaskColumn */}
               <TaskColumn title="To Do" tasks={tasksToDo} count={tasksToDo.length} onTaskClick={handleTaskClick} onDeleteRequest={handleDeleteRequest} onDrop={(e) => handleDrop(e, 'To Do')} onDragOver={handleDragOver} />
               <TaskColumn title="In Progress" tasks={tasksInProgress} count={tasksInProgress.length} onTaskClick={handleTaskClick} onDeleteRequest={handleDeleteRequest} onDrop={(e) => handleDrop(e, 'In Progress')} onDragOver={handleDragOver} />
               <TaskColumn title="In Review" tasks={tasksInReview} count={tasksInReview.length} onTaskClick={handleTaskClick} onDeleteRequest={handleDeleteRequest} onDrop={(e) => handleDrop(e, 'In Review')} onDragOver={handleDragOver} />

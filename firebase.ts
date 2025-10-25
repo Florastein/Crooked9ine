@@ -1,11 +1,8 @@
 // Import the functions you need from the SDKs you need
-// FIX: The import from 'firebase/app' with Firebase v9+ doesn't have a default export for the namespaced API. Using 'firebase/compat/app' provides compatibility for the v8 syntax used below.
-import firebase from "firebase/compat/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// TODO: Add your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBoe0wIOJPych6xsfY2gvBcG41hBVeTMt8",
   authDomain: "crooked9ine.firebaseapp.com",
@@ -16,6 +13,7 @@ const firebaseConfig = {
   measurementId: "G-H0JTKS5DVC"
 };
 
+
 // Initialize Firebase
-// FIX: Used the firebase object from the default import to call initializeApp, which is the correct syntax for Firebase v8.
-const app = firebase.initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);

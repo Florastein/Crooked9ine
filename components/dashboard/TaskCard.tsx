@@ -4,13 +4,15 @@ import { Task } from '../../types';
 interface TaskCardProps {
   task: Task;
   onTaskClick: (task: Task) => void;
+  // FIX: Added onDeleteRequest prop to handle deletion.
   onDeleteRequest: (task: Task) => void;
 }
 
-const priorityColors = {
-  High: 'bg-red-500',
-  Medium: 'bg-yellow-500',
-  Low: 'bg-green-500',
+const colorMap = {
+    red: 'border-l-task-red',
+    yellow: 'border-l-task-yellow',
+    green: 'border-l-task-green',
+    blue: 'border-l-task-blue',
 };
 
 export const TaskCard: React.FC<TaskCardProps> = ({ task, onTaskClick, onDeleteRequest }) => {
@@ -25,48 +27,54 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onTaskClick, onDeleteR
     setIsDragging(false);
   };
 
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDeleteRequest(task);
+  };
+
   return (
     <div 
       onClick={() => onTaskClick(task)}
-      className={`group relative bg-card dark:bg-card-dark p-4 rounded-lg shadow-md cursor-grab active:cursor-grabbing hover:shadow-lg transition-all ${isDragging ? 'opacity-50 scale-95' : ''}`}
+      className={`bg-card dark:bg-card-dark p-4 rounded-lg shadow-md cursor-grab active:cursor-grabbing hover:shadow-lg transition-all border-l-4 ${colorMap[task.categoryColor]} ${isDragging ? 'opacity-50 scale-95' : ''}`}
       draggable="true"
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex justify-between items-start">
-        <h3 className="font-bold text-md text-text-main dark:text-text-main-dark mb-2 pr-4">{task.title}</h3>
-        <span className={`px-2 py-1 text-xs font-semibold text-white rounded-full ${priorityColors[task.priority]}`}>
-          {task.priority}
-        </span>
+      {/* FIX: Replaced h3 with a div to accommodate a delete button next to the title. */}
+      <div className="flex justify-between items-start mb-2">
+        <h3 className="font-semibold text-text-main dark:text-text-main-dark pr-2">{task.title}</h3>
+        <button 
+          onClick={handleDeleteClick} 
+          className="p-1 -mr-1 -mt-1 rounded-full text-text-secondary dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-600 hover:text-red-500"
+          title="Delete task"
+        >
+          <span className="material-symbols-outlined text-lg">delete</span>
+        </button>
       </div>
-      <p className="text-sm text-text-secondary dark:text-text-secondary-dark mb-4 line-clamp-2">{task.description}</p>
-      <div className="flex items-center justify-between">
-        <div className="flex -space-x-2">
-          {task.assignees.map(user => (
-            <img 
-              key={user.id}
-              className="inline-block h-6 w-6 rounded-full ring-2 ring-white dark:ring-gray-800"
-              src={user.avatar || `https://ui-avatars.com/api/?name=${user.name.replace(' ', '+')}&background=random`} 
-              alt={user.name}
-              title={user.name}
-            />
-          ))}
-        </div>
-        <div className="text-xs text-text-secondary dark:text-text-secondary-dark flex items-center">
-            <span className="material-symbols-outlined text-sm mr-1">calendar_today</span>
-            <span>{new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-        </div>
+      <p className="text-xs text-text-secondary dark:text-text-secondary-dark mb-4">
+        {task.status === 'Done' && task.completedDate 
+          ? `Completed: ${new Date(task.completedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}` 
+          : `Due: ${new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
+      </p>
+      <div className="flex items-center justify-end">
+        {task.status === 'Done' ? (
+            <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
+                <span className="material-symbols-outlined text-green-600 text-base">check</span>
+            </div>
+        ) : (
+            <div className="flex -space-x-2">
+                {task.assignees.map(assignee => (
+                    <img
+                        key={assignee.id}
+                        src={assignee.avatar}
+                        alt={assignee.name}
+                        title={assignee.name}
+                        className="w-6 h-6 rounded-full border-2 border-card dark:border-card-dark"
+                    />
+                ))}
+            </div>
+        )}
       </div>
-       <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onDeleteRequest(task);
-        }}
-        className="absolute top-3 right-3 p-1 rounded-full text-text-secondary dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-700 opacity-0 group-hover:opacity-100 transition-opacity"
-        aria-label={`Delete task ${task.title}`}
-      >
-        <span className="material-symbols-outlined text-base">delete</span>
-      </button>
     </div>
   );
 };

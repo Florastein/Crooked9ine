@@ -34,6 +34,7 @@ export const mockTasks: Task[] = [
     project: 'Project Phoenix',
     sprint: 'Sprint 1',
     tags: ['UI', 'Design'],
+    categoryColor: 'blue',
   },
   {
     id: 'task-2',
@@ -47,6 +48,7 @@ export const mockTasks: Task[] = [
     sprint: 'Sprint 1',
     tags: ['Frontend', 'Auth'],
     comments: mockComments,
+    categoryColor: 'red',
   },
   {
     id: 'task-3',
@@ -59,6 +61,7 @@ export const mockTasks: Task[] = [
     project: 'Project Phoenix',
     sprint: 'Sprint 1',
     tags: ['Backend', 'Database'],
+    categoryColor: 'yellow',
   },
   {
     id: 'task-4',
@@ -71,6 +74,8 @@ export const mockTasks: Task[] = [
     project: 'Project Phoenix',
     sprint: 'Sprint 1',
     tags: ['Frontend', 'Component'],
+    categoryColor: 'green',
+    completedDate: '2023-10-25',
   },
   {
     id: 'task-5',
@@ -83,6 +88,7 @@ export const mockTasks: Task[] = [
     project: 'Project Phoenix',
     sprint: 'Sprint 1',
     tags: ['Frontend', 'API'],
+    categoryColor: 'red',
   },
   {
     id: 'task-6',
@@ -95,5 +101,6 @@ export const mockTasks: Task[] = [
     project: 'Project Phoenix',
     sprint: 'Sprint 2',
     tags: ['Bug', 'CSS'],
+    categoryColor: 'red',
   }
 ];

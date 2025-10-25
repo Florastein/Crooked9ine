@@ -7,12 +7,13 @@ interface TaskColumnProps {
   tasks: Task[];
   count: number;
   onTaskClick: (task: Task) => void;
-  onDeleteRequest: (task: Task) => void;
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void;
   onDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
+  // FIX: Added onDeleteRequest to allow task deletion from the column.
+  onDeleteRequest: (task: Task) => void;
 }
 
-export const TaskColumn: React.FC<TaskColumnProps> = ({ title, tasks, count, onTaskClick, onDeleteRequest, onDrop, onDragOver }) => {
+export const TaskColumn: React.FC<TaskColumnProps> = ({ title, tasks, count, onTaskClick, onDrop, onDragOver, onDeleteRequest }) => {
   const [isDraggedOver, setIsDraggedOver] = useState(false);
 
   return (
@@ -37,6 +38,7 @@ export const TaskColumn: React.FC<TaskColumnProps> = ({ title, tasks, count, onT
       </div>
       <div className="space-y-4 min-h-[100px]">
         {tasks.map(task => (
+          // FIX: Passed onDeleteRequest down to TaskCard.
           <TaskCard key={task.id} task={task} onTaskClick={onTaskClick} onDeleteRequest={onDeleteRequest} />
         ))}
         {tasks.length === 0 && (

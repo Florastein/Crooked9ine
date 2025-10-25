@@ -18,11 +18,13 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ onClose, onCre
       alert('Title and Due Date are required.');
       return;
     }
+    // FIX: Add missing 'categoryColor' property to satisfy the Omit<Task, ...> type.
     onCreate({
       title,
       description,
       dueDate,
       priority,
+      categoryColor: 'blue',
     });
   };
 

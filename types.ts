@@ -23,4 +23,6 @@ export type Task = {
   sprint?: string;
   comments?: Comment[];
   tags?: string[];
+  categoryColor: 'red' | 'yellow' | 'green' | 'blue';
+  completedDate?: string;
 };
