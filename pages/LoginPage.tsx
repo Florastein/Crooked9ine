@@ -16,7 +16,10 @@ export const LoginPage: React.FC = () => {
         {/* Image Section */}
         <div 
           className="hidden md:block w-1/2 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1547027923-4f4b0f32432b?q=80&w=1974&auto=format&fit=crop')" }}
+          style={{
+              backgroundImage:
+                'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAa7pjnjytnfyrvdE6Vr0AZefQCs2h1142Shr_RX-FqXvhWcM33vfUBgiiKrITbejgU6U8sqsByurdx6599cLu5-qW8NWKUI9IxAEIGjy1hfGZfiiDyrRl3HLcpYtippLOBdft_dXHOtE_H_VpIrOrVvES8cYcnvbAoe9alvv4aLMjDWO2nSUF727EMAPrnScRjcusl1OZfnElHwwxFlvn-ZvqeJSOzrIu8RFrdVFMaB3j451PvfIM93qFn2gBgF7cahXGIqKtdIYdr")',
+            }}
           aria-hidden="true"
         ></div>
 
