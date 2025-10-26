@@ -1,19 +1,66 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/firebase';
 
 interface AdminSidebarProps {
   onClose?: () => void;
+  onCreateTaskClick?: () => void; // Add this prop
 }
 
-export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onClose }) => {
+interface FirebaseUserData {
+  name?: string;
+  avatar?: string;
+}
+
+export const AdminSidebar: React.FC<AdminSidebarProps> = ({ 
+  onClose, 
+  onCreateTaskClick // Destructure the prop
+}) => {
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [userData, setUserData] = useState<FirebaseUserData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch user data from Firestore
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!user?.email) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const usersRef = doc(db, 'Users', user.uid);
+        const userDoc = await getDoc(usersRef);
+        
+        if (userDoc.exists()) {
+          setUserData(userDoc.data() as FirebaseUserData);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [user]);
+
+  const handleCreateTaskClick = () => {
+    if (onCreateTaskClick) {
+      onCreateTaskClick(); // Use the callback from parent
+    } else {
+      // Fallback: navigate to tasks page if no callback provided
+      navigate('/admin/tasks/create');
+    }
+  };
 
   const handleLinkClick = (path: string) => {
     navigate(path);
-    // Close sidebar on mobile when a link is clicked
     if (window.innerWidth < 1024 && onClose) {
       onClose();
     }
@@ -43,6 +90,18 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onClose }) => {
       active: isActivePath('/admin/teams')
     },
   ];
+
+  const getDisplayName = () => {
+    if (userData?.name) return userData.name;
+    if (user?.displayName) return user.displayName;
+    return 'User Name';
+  };
+
+  const getAvatarUrl = () => {
+    if (userData?.avatar) return userData.avatar;
+    if (user?.photoURL) return user.photoURL;
+    return `https://i.pravatar.cc/48?u=${user?.email || 'user-avatar'}`;
+  };
 
   return (
     <div className="w-64 h-full bg-white shadow-md p-4 flex flex-col overflow-y-auto">
@@ -98,9 +157,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onClose }) => {
 
       {/* Bottom section */}
       <div className="mt-auto space-y-3 sm:space-y-4">
-        {/* Create New Task Button - Full width in sidebar */}
+        {/* Create New Task Button */}
         <button 
-          onClick={() => handleLinkClick('/admin/tasks/create')}
+          onClick={handleCreateTaskClick}
           className="w-full flex items-center justify-center gap-2 bg-gray-800 text-white font-semibold py-2 px-3 rounded-lg text-xs sm:text-sm hover:bg-gray-700 transition-colors"
         >
           <span className="material-symbols-outlined text-sm">add</span>
@@ -109,26 +168,40 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onClose }) => {
 
         {/* User profile */}
         <div className="flex items-center gap-2 pt-3 sm:pt-4 border-t border-gray-200">
-          <img 
-            src={user?.photoURL || "https://i.pravatar.cc/48?u=user-avatar"} 
-            alt="User avatar" 
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover" 
-          />
-          <div className="flex flex-col min-w-0 flex-1">
-            <span className="font-semibold text-xs sm:text-sm truncate">
-              {user?.displayName || 'User Name'}
-            </span>
-            <span className="text-xs text-gray-500 truncate">
-              {user?.email || 'user@example.com'}
-            </span>
-          </div>
-          {/* Settings button */}
-          <button 
-            onClick={() => handleLinkClick('/admin/profile')}
-            className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <span className="material-symbols-outlined text-sm">settings</span>
-          </button>
+          {loading ? (
+            <div className="flex items-center gap-2 w-full">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-200 animate-pulse"></div>
+              <div className="flex flex-col min-w-0 flex-1 space-y-1">
+                <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                <div className="h-2 bg-gray-200 rounded animate-pulse w-1/2"></div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <img 
+                src={getAvatarUrl()} 
+                alt="User avatar" 
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover" 
+                onError={(e) => {
+                  e.currentTarget.src = `https://i.pravatar.cc/48?u=${user?.email || 'user-avatar'}`;
+                }}
+              />
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="font-semibold text-xs sm:text-sm truncate">
+                  {getDisplayName()}
+                </span>
+                <span className="text-xs text-gray-500 truncate">
+                  {user?.email || 'user@example.com'}
+                </span>
+              </div>
+              <button 
+                onClick={() => handleLinkClick('/admin/profile')}
+                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <span className="material-symbols-outlined text-sm">settings</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
