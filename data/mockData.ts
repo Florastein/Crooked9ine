@@ -12,7 +12,7 @@ const mockComments: Comment[] = [
         id: 'comment-1',
         user: mockUsers[2],
         text: 'I\'ve started working on the authentication logic. Should have a PR ready by EOD.',
-        timestamp: '2025-10-25T10:00:00Z',
+        timestamp: '202-10-25T10:00:00Z',
     },
     {
         id: 'comment-2',

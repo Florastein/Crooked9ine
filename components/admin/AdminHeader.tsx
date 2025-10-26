@@ -2,9 +2,22 @@ import React from 'react';
 
 interface AdminHeaderProps {
   onMenuToggle: () => void;
+  onCreateTaskClick?: () => void; // Add this prop
 }
 
-export const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuToggle }) => {
+export const AdminHeader: React.FC<AdminHeaderProps> = ({ 
+  onMenuToggle, 
+  onCreateTaskClick // Destructure the prop
+}) => {
+  const handleCreateTaskClick = () => {
+    if (onCreateTaskClick) {
+      onCreateTaskClick(); // Use the callback from parent
+    } else {
+      // Fallback behavior if no callback provided
+      console.log('Create Task clicked - no handler provided');
+    }
+  };
+
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
       <div className="flex items-center justify-between p-3 sm:p-4">
@@ -42,7 +55,10 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuToggle }) => {
           </button>
 
           {/* Create New Task Button - Text hidden on mobile, icon only */}
-          <button className="flex items-center gap-1 sm:gap-2 bg-gray-800 text-white font-semibold py-1.5 sm:py-2 px-2 sm:px-4 rounded-lg text-xs sm:text-sm hover:bg-gray-700 transition-colors">
+          <button 
+            onClick={handleCreateTaskClick}
+            className="flex items-center gap-1 sm:gap-2 bg-gray-800 text-white font-semibold py-1.5 sm:py-2 px-2 sm:px-4 rounded-lg text-xs sm:text-sm hover:bg-gray-700 transition-colors"
+          >
             <span className="material-symbols-outlined text-sm sm:text-base">add</span>
             <span className="hidden sm:inline">Create New Task</span>
           </button>

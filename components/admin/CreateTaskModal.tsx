@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import emailjs from 'emailjs-com';
+import { db } from '@/firebase';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
 interface User {
   id: string;
@@ -12,7 +14,7 @@ interface User {
 interface CreateTaskModalProps {
   onClose: () => void;
   onSave: (taskData: TaskData) => void;
-  users: User[]; // List of users for assignment
+  users: User[];
 }
 
 export interface TaskData {
@@ -27,11 +29,7 @@ export interface TaskData {
   status: 'pending' | 'in-progress' | 'completed';
 }
 
-export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ 
-  onClose, 
-  onSave, 
-  users 
-}) => {
+export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ onClose, onSave, users }) => {
   const [formData, setFormData] = useState<TaskData>({
     title: '',
     description: '',
@@ -55,12 +53,10 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   const [sendingEmails, setSendingEmails] = useState(false);
   const [emailStatus, setEmailStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
-  // Get unique divisions from users
   const divisions = Array.from(new Set(users.map(user => user.division))).filter(Boolean);
 
-  // Initialize EmailJS (you'll need to set this up with your EmailJS account)
   useEffect(() => {
-    emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // Replace with your actual public key
+    emailjs.init('A76KX-nzZGQIxJpmU'); // Replace with your actual public key
   }, []);
 
   const validateForm = () => {
@@ -72,42 +68,25 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       dueDate: '',
     };
 
-    if (!formData.title.trim()) {
-      newErrors.title = 'Task title is required';
-    }
-
-    if (!formData.description.trim()) {
-      newErrors.description = 'Task description is required';
-    }
-
-    if (!formData.dueDate) {
-      newErrors.dueDate = 'Due date is required';
-    } else if (new Date(formData.dueDate) < new Date()) {
-      newErrors.dueDate = 'Due date cannot be in the past';
-    }
-
-    if (formData.assigneeType === 'division' && !formData.assignedDivision) {
-      newErrors.assignedDivision = 'Please select a division';
-    }
-
-    if (formData.assigneeType === 'individual' && (!formData.assignedUserIds || formData.assignedUserIds.length === 0)) {
-      newErrors.assignedUsers = 'Please select at least one team member';
-    }
+    if (!formData.title.trim()) newErrors.title = 'Task title is required';
+    if (!formData.description.trim()) newErrors.description = 'Task description is required';
+    if (!formData.dueDate) newErrors.dueDate = 'Due date is required';
+    else if (new Date(formData.dueDate) < new Date()) newErrors.dueDate = 'Due date cannot be in the past';
+    if (formData.assigneeType === 'division' && !formData.assignedDivision) newErrors.assignedDivision = 'Please select a division';
+    if (formData.assigneeType === 'individual' && (!formData.assignedUserIds?.length)) newErrors.assignedUsers = 'Please select at least one team member';
 
     setErrors(newErrors);
-    return !Object.values(newErrors).some(error => error);
+    return !Object.values(newErrors).some(Boolean);
   };
 
   const handleUserSelection = (userId: string, isSelected: boolean) => {
     setFormData(prev => {
       const currentUserIds = prev.assignedUserIds || [];
       const currentUsers = prev.assignedUsers || [];
-      
       const user = users.find(u => u.id === userId);
-      
       let newUserIds = [...currentUserIds];
       let newUsers = [...currentUsers];
-      
+
       if (isSelected) {
         if (!newUserIds.includes(userId)) {
           newUserIds.push(userId);
@@ -117,13 +96,25 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
         newUserIds = newUserIds.filter(id => id !== userId);
         newUsers = newUsers.filter(name => name !== user?.name);
       }
-      
-      return {
-        ...prev,
-        assignedUserIds: newUserIds,
-        assignedUsers: newUsers,
-      };
+
+      return { ...prev, assignedUserIds: newUserIds, assignedUsers: newUsers };
     });
+  };
+
+  const getRecipientEmails = async (taskData: TaskData) => {
+    if (taskData.assigneeType === 'individual' && taskData.assignedUserIds) {
+      return taskData.assignedUserIds
+        .map(id => {
+          const user = users.find(u => u.id === id);
+          return user ? { email: user.email, name: user.name } : null;
+        })
+        .filter(Boolean) as { email: string; name: string }[];
+    } else if (taskData.assigneeType === 'division' && taskData.assignedDivision) {
+      return users
+        .filter(u => u.division === taskData.assignedDivision)
+        .map(u => ({ email: u.email, name: u.name }));
+    }
+    return [];
   };
 
   const sendEmailNotifications = async (taskData: TaskData) => {
@@ -132,111 +123,72 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
       setEmailStatus('sending');
 
       const recipients = await getRecipientEmails(taskData);
-      
-      if (recipients.length === 0) {
-        console.log('No recipients found for email notification');
-        setEmailStatus('idle');
-        return;
-      }
+      if (recipients.length === 0) return setEmailStatus('idle');
 
-      // Send email to each recipient
-      const emailPromises = recipients.map(async (recipient) => {
-        const templateParams = {
-          to_name: recipient.name,
-          to_email: recipient.email,
-          task_title: taskData.title,
-          task_description: taskData.description,
-          task_priority: taskData.priority,
-          task_due_date: new Date(taskData.dueDate).toLocaleDateString(),
-          assigned_by: 'Admin', // You might want to get the actual admin name
-          from_name: 'crooked9ine Team',
-          reply_to: 'noreply@crooked9ine.com',
-        };
-
-        return emailjs.send(
-          'YOUR_EMAILJS_SERVICE_ID', // Replace with your service ID
-          'YOUR_EMAILJS_TEMPLATE_ID', // Replace with your template ID
-          templateParams
-        );
-      });
+      const emailPromises = recipients.map(r =>
+        emailjs.send(
+          'service_8be88rh', // Replace with your service ID
+          'template_zb53h7d', // Replace with your template ID
+          {
+            to_name: r.name,
+            to_email: r.email,
+            task_title: taskData.title,
+            task_description: taskData.description,
+            task_priority: taskData.priority,
+            task_due_date: new Date(taskData.dueDate).toLocaleDateString(),
+            assigned_by: 'Admin',
+            from_name: 'crooked9ine Team',
+            reply_to: 'noreply@crooked9ine.com',
+          }
+        )
+      );
 
       await Promise.all(emailPromises);
       setEmailStatus('sent');
-      
     } catch (error) {
-      console.error('Error sending email notifications:', error);
+      console.error('Error sending emails:', error);
       setEmailStatus('error');
     } finally {
       setSendingEmails(false);
     }
   };
 
-  const getRecipientEmails = async (taskData: TaskData): Promise<{email: string; name: string}[]> => {
-    if (taskData.assigneeType === 'individual' && taskData.assignedUserIds) {
-      return taskData.assignedUserIds
-        .map(userId => {
-          const user = users.find(u => u.id === userId);
-          return user ? { email: user.email, name: user.name } : null;
-        })
-        .filter(Boolean) as {email: string; name: string}[];
-    } else if (taskData.assigneeType === 'division' && taskData.assignedDivision) {
-      return users
-        .filter(user => user.division === taskData.assignedDivision)
-        .map(user => ({ email: user.email, name: user.name }));
-    }
-    
-    return [];
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
-      // First save the task
+      // ✅ Save task to Firestore
+      const taskRef = await addDoc(collection(db, 'Tasks'), {
+        ...formData,
+        createdAt: serverTimestamp(),
+      });
+      console.log('Task saved with ID:', taskRef.id);
+
+      // Trigger onSave (optional callback)
       onSave(formData);
-      
-      // Then send email notifications
+
+      // ✅ Send email notifications
       await sendEmailNotifications(formData);
-      
-      // Close modal after a short delay to show success
-      setTimeout(() => {
-        onClose();
-      }, 2000);
-      
+
+      // ✅ Close modal after short delay
+      setTimeout(onClose, 2000);
     } catch (error) {
       console.error('Error creating task:', error);
     }
   };
 
   const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    
-    // Clear error when user starts typing
-    if (errors[field as keyof typeof errors]) {
-      setErrors(prev => ({
-        ...prev,
-        [field]: ''
-      }));
-    }
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field as keyof typeof errors]) setErrors(prev => ({ ...prev, [field]: '' }));
   };
 
   const getEmailStatusMessage = () => {
     switch (emailStatus) {
-      case 'sending':
-        return 'Sending notifications...';
-      case 'sent':
-        return 'Notifications sent successfully!';
-      case 'error':
-        return 'Error sending notifications';
-      default:
-        return null;
+      case 'sending': return 'Sending notifications...';
+      case 'sent': return 'Notifications sent successfully!';
+      case 'error': return 'Error sending notifications';
+      default: return null;
     }
   };
 

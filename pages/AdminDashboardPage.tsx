@@ -4,7 +4,7 @@ import { AdminHeader } from '../components/admin/AdminHeader';
 import { StatsCard } from '../components/admin/StatsCard';
 import { RecentUsers } from '../components/admin/RecentUsers';
 import { TrafficSource } from '../components/admin/TrafficSource';
-import { CreateTaskModal } from '../components/admin/CreateTaskModal'; // Import the modal
+import { CreateTaskModal } from '../components/admin/CreateTaskModal';
 import { db } from '@/firebase';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 
@@ -119,7 +119,10 @@ export const AdminDashboardPage: React.FC = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        <AdminHeader onMenuToggle={toggleSidebar} />
+        <AdminHeader 
+          onMenuToggle={toggleSidebar} 
+          onCreateTaskClick={handleCreateTaskClick} // Pass the same callback to header
+        />
         
         <main className="flex-1 p-3 sm:p-4 lg:p-6 xl:p-8 overflow-auto">
           {/* Stats Grid */}
